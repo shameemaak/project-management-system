@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth, teams, projects, tasks, comments, sprints
+from routers import auth, teams, projects, tasks, comments, sprints, ai
 
 app = FastAPI(title="AI Project Management System", version="1.0.0")
 
@@ -18,6 +18,7 @@ app.include_router(projects.router)
 app.include_router(tasks.router)
 app.include_router(comments.router)
 app.include_router(sprints.router)
+app.include_router(ai.router)
 
 @app.get("/")
 def root():
