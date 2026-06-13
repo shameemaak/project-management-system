@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Project Manager</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: #f0f4f8; }
+    .hidden { display: none !important; }
+    nav { background: #2563eb; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    nav h1 { font-size: 1.3rem; }
+    .nav-right { display: flex; gap: 1rem; align-items: center; }
+    .btn { padding: 0.5rem 1.2rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-success:hover { background: #15803d; }
+    .btn-purple { background: #7c3aed; color: white; }
+    .btn-purple:hover { background: #6d28d9; }
+    .btn-warning { background: #d97706; color: white; }
+    .btn-white { background: white; color: #2563eb; }
+    .btn-danger { background: #dc2626; color: white; }
+    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+    .auth-box { max-width: 420px; margin: 5rem auto; background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .auth-box h2 { text-align: center; color: #2563eb; margin-bottom: 1.5rem; font-size: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem;
+    }
+    .form-group textarea { resize: vertical; }
+    .error { color: #dc2626; margin-bottom: 1rem; font-size: 0.9rem; }
+    .success { color: #16a34a; margin-bottom: 1rem; font-size: 0.9rem; }
+    .link { color: #2563eb; cursor: pointer; text-decoration: underline; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card { background: white; border-radius: 10px; padding: 1.2rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .stat-num { font-size: 2rem; font-weight: bold; }
+    .stat-label { color: #6b7280; font-size: 0.9rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .card { background: white; border-radius: 10px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .card h3 { margin-bottom: 1rem; font-size: 1rem; color: #1f2937; }
+    .card-full { background: white; border-radius: 10px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
+    .card-full h3 { margin-bottom: 1rem; font-size: 1rem; color: #1f2937; }
+    .item-list { margin-top: 0.8rem; }
+    .item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.5rem 0.8rem; margin-bottom: 0.4rem; font-size: 0.9rem; }
+    .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .kanban-col { background: #f3f4f6; border-radius: 8px; padding: 0.8rem; min-height: 200px; }
+    .kanban-col h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.8rem; text-transform: capitalize; color: #374151; }
+    .task-card { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.6rem; margin-bottom: 0.5rem; font-size: 0.85rem; }
+    .task-card p { font-weight: 500; margin-bottom: 0.3rem; }
+    .task-card select { width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px 4px; font-size: 0.8rem; }
+    .badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 0.75rem; }
+    .badge-high { background: #fee2e2; color: #991b1b; }
+    .badge-medium { background: #fef3c7; color: #92400e; }
+    .badge-low { background: #d1fae5; color: #065f46; }
+    .badge-urgent { background: #ede9fe; color: #5b21b6; }
+    label { font-size: 0.85rem; color: #374151; margin-bottom: 0.3rem; display: block; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar" class="hidden">
+  <h1>🤖 AI Project Manager</h1>
+  <div class="nav-right">
+    <span id="nav-user"></span>
+    <button class="btn btn-white" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<!-- LOGIN PAGE -->
+<div id="login-page">
+  <div class="auth-box">
+    <h2>🤖 AI Project Manager</h2>
+    <div id="login-error" class="error hidden"></div>
+    <div class="form-group"><input type="email" id="login-email" placeholder="Email"/></div>
+    <div class="form-group"><input type="password" id="login-password" placeholder="Password"/></div>
+    <div class="form-group"><button class="btn btn-primary" style="width:100%" onclick="login()">Login</button></div>
+    <p style="text-align:center;font-size:0.9rem">No account? <span class="link" onclick="showRegister()">Register</span></p>
+  </div>
+</div>
+
+<!-- REGISTER PAGE -->
+<div id="register-page" class="hidden">
+  <div class="auth-box">
+    <h2>🤖 Create Account</h2>
+    <div id="register-error" class="error hidden"></div>
+    <div class="form-group"><input type="text" id="reg-name" placeholder="Full Name"/></div>
+    <div class="form-group"><input type="email" id="reg-email" placeholder="Email"/></div>
+    <div class="form-group"><input type="password" id="reg-password" placeholder="Password"/></div>
+    <div class="form-group"><button class="btn btn-primary" style="width:100%" onclick="register()">Register</button></div>
+    <p style="text-align:center;font-size:0.9rem">Have account? <span class="link" onclick="showLogin()">Login</span></p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard-page" class="hidden">
+  <div class="container">
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="stat-teams" style="color:#2563eb">0</div><div class="stat-label">Teams</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-projects" style="color:#16a34a">0</div><div class="stat-label">Projects</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-tasks" style="color:#7c3aed">0</div><div class="stat-label">Tasks</div></div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Create Team -->
+      <div class="card">
+        <h3>👥 Create Team</h3>
+        <div class="form-group"><label>Team Name</label><input type="text" id="team-name" placeholder="Team name"/></div>
+        <div class="form-group"><label>Description</label><input type="text" id="team-desc" placeholder="Description"/></div>
+        <button class="btn btn-primary" onclick="createTeam()">Create Team</button>
+        <div class="item-list" id="teams-list"></div>
+      </div>
+
+      <!-- Create Project -->
+      <div class="card">
+        <h3>📁 Create Project</h3>
+        <div class="form-group"><label>Select Team</label><select id="project-team"><option value="">Select Team</option></select></div>
+        <div class="form-group"><label>Project Name</label><input type="text" id="project-name" placeholder="Project name"/></div>
+        <div class="form-group"><label>Description</label><input type="text" id="project-desc" placeholder="Description"/></div>
+        <button class="btn btn-success" onclick="createProject()">Create Project</button>
+        <div class="item-list" id="projects-list"></div>
+      </div>
+    </div>
+
+    <!-- AI Task Breakdown -->
+    <div class="card-full">
+      <h3>🤖 AI Task Breakdown</h3>
+      <div class="form-group"><label>Select Project</label><select id="ai-project"><option value="">Select Project</option></select></div>
+      <div class="form-group"><label>Describe your project</label><textarea id="ai-desc" rows="3" placeholder="e.g. Build an e-commerce website with product listing, cart, and payment gateway..."></textarea></div>
+      <button class="btn btn-purple" id="ai-btn" onclick="aiBreakdown()">✨ Generate Tasks with AI</button>
+      <div id="ai-message" class="success hidden" style="margin-top:0.8rem"></div>
+    </div>
+
+    <!-- Create Task -->
+    <div class="card-full">
+      <h3>✅ Create Task Manually</h3>
+      <div class="grid-2">
+        <div class="form-group"><label>Select Project</label>
+          <select id="task-project" onchange="loadTasks(this.value)"><option value="">Select Project</option></select>
+        </div>
+        <div class="form-group"><label>Priority</label>
+          <select id="task-priority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Task Title</label><input type="text" id="task-title" placeholder="Task title"/></div>
+        <div class="form-group"><label>Description</label><input type="text" id="task-desc" placeholder="Description"/></div>
+      </div>
+      <button class="btn btn-warning" onclick="createTask()">Create Task</button>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="card-full" id="kanban-section" style="display:none">
+      <h3>📋 Task Board</h3>
+      <div class="kanban">
+        <div class="kanban-col"><h4>📌 Todo</h4><div id="col-todo"></div></div>
+        <div class="kanban-col"><h4>🔄 In Progress</h4><div id="col-in_progress"></div></div>
+        <div class="kanban-col"><h4>👀 Review</h4><div id="col-review"></div></div>
+        <div class="kanban-col"><h4>✅ Done</h4><div id="col-done"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8000';
+let token = localStorage.getItem('token');
+let teams = [], projects = [], tasks = [];
+
+function getHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+}
+
+async function api(method, path, body) {
+  const res = await fetch(API + path, {
+    method, headers: getHeaders(),
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+// AUTH
+function showRegister() { document.getElementById('login-page').classList.add('hidden'); document.getElementById('register-page').classList.remove('hidden'); }
+function showLogin() { document.getElementById('register-page').classList.add('hidden'); document.getElementById('login-page').classList.remove('hidden'); }
+
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  try {
+    const data = await api('POST', '/auth/login', { email, password });
+    token = data.access_token;
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    showDashboard();
+  } catch {
+    const el = document.getElementById('login-error');
+    el.textContent = 'Invalid email or password';
+    el.classList.remove('hidden');
+  }
+}
+
+async function register() {
+  const full_name = document.getElementById('reg-name').value;
+  const email = document.getElementById('reg-email').value;
+  const password = document.getElementById('reg-password').value;
+  try {
+    const data = await api('POST', '/auth/register', { full_name, email, password });
+    token = data.access_token;
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    showDashboard();
+  } catch {
+    const el = document.getElementById('register-error');
+    el.textContent = 'Registration failed. Email may already exist.';
+    el.classList.remove('hidden');
+  }
+}
+
+function logout() {
+  localStorage.clear();
+  token = null;
+  document.getElementById('dashboard-page').classList.add('hidden');
+  document.getElementById('navbar').classList.add('hidden');
+  document.getElementById('login-page').classList.remove('hidden');
+}
+
+function showDashboard() {
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('register-page').classList.add('hidden');
+  document.getElementById('dashboard-page').classList.remove('hidden');
+  document.getElementById('navbar').classList.remove('hidden');
+  const user = JSON.parse(localStorage.getItem('user'));
+  document.getElementById('nav-user').textContent = user?.full_name || '';
+  fetchData();
+}
+
+// DATA
+async function fetchData() {
+  try {
+    [teams, projects] = await Promise.all([api('GET', '/teams/'), api('GET', '/projects/')]);
+    renderTeams(); renderProjects();
+    document.getElementById('stat-teams').textContent = teams.length;
+    document.getElementById('stat-projects').textContent = projects.length;
+  } catch {}
+}
+
+function renderTeams() {
+  const list = document.getElementById('teams-list');
+  const sel1 = document.getElementById('project-team');
+  list.innerHTML = teams.map(t => `<div class="item">👥 ${t.name}</div>`).join('');
+  sel1.innerHTML = '<option value="">Select Team</option>' + teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+}
+
+function renderProjects() {
+  const list = document.getElementById('projects-list');
+  const sel1 = document.getElementById('task-project');
+  const sel2 = document.getElementById('ai-project');
+  list.innerHTML = projects.map(p => `<div class="item" onclick="loadTasks('${p.id}')" style="cursor:pointer">📁 ${p.name} <small style="color:#9ca3af">(click for tasks)</small></div>`).join('');
+  const opts = '<option value="">Select Project</option>' + projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  sel1.innerHTML = opts;
+  sel2.innerHTML = opts;
+}
+
+async function loadTasks(projectId) {
+  if (!projectId) return;
+  document.getElementById('task-project').value = projectId;
+  try {
+    tasks = await api('GET', `/tasks/project/${projectId}`);
+    document.getElementById('stat-tasks').textContent = tasks.length;
+    renderKanban();
+  } catch {}
+}
+
+function renderKanban() {
+  const cols = ['todo', 'in_progress', 'review', 'done'];
+  cols.forEach(status => {
+    const col = document.getElementById(`col-${status}`);
+    const filtered = tasks.filter(t => t.status === status);
+    col.innerHTML = filtered.map(task => `
+      <div class="task-card">
+        <p>${task.title}</p>
+        <span class="badge badge-${task.priority}">${task.priority}</span>
+        <select onchange="updateTask('${task.id}', this.value)" style="margin-top:4px">
+          <option value="todo" ${task.status==='todo'?'selected':''}>Todo</option>
+          <option value="in_progress" ${task.status==='in_progress'?'selected':''}>In Progress</option>
+          <option value="review" ${task.status==='review'?'selected':''}>Review</option>
+          <option value="done" ${task.status==='done'?'selected':''}>Done</option>
+        </select>
+      </div>
+    `).join('');
+  });
+  document.getElementById('kanban-section').style.display = 'block';
+}
+
+// ACTIONS
+async function createTeam() {
+  const name = document.getElementById('team-name').value;
+  const description = document.getElementById('team-desc').value;
+  if (!name) { alert('Enter team name'); return; }
+  try {
+    await api('POST', '/teams/', { name, description });
+    document.getElementById('team-name').value = '';
+    document.getElementById('team-desc').value = '';
+    fetchData();
+  } catch { alert('Failed to create team'); }
+}
+
+async function createProject() {
+  const name = document.getElementById('project-name').value;
+  const description = document.getElementById('project-desc').value;
+  const team_id = document.getElementById('project-team').value;
+  if (!name || !team_id) { alert('Enter project name and select team'); return; }
+  try {
+    await api('POST', '/projects/', { name, description, team_id });
+    document.getElementById('project-name').value = '';
+    document.getElementById('project-desc').value = '';
+    fetchData();
+  } catch { alert('Failed to create project'); }
+}
+
+async function createTask() {
+  const title = document.getElementById('task-title').value;
+  const description = document.getElementById('task-desc').value;
+  const priority = document.getElementById('task-priority').value;
+  const project_id = document.getElementById('task-project').value;
+  if (!title || !project_id) { alert('Enter title and select project'); return; }
+  try {
+    await api('POST', '/tasks/', { title, description, priority, project_id });
+    document.getElementById('task-title').value = '';
+    document.getElementById('task-desc').value = '';
+    loadTasks(project_id);
+  } catch { alert('Failed to create task'); }
+}
+
+async function updateTask(taskId, status) {
+  const projectId = document.getElementById('task-project').value;
+  try {
+    await api('PUT', `/tasks/${taskId}`, { status });
+    loadTasks(projectId);
+  } catch {}
+}
+
+async function aiBreakdown() {
+  const project_description = document.getElementById('ai-desc').value;
+  const project_id = document.getElementById('ai-project').value;
+  if (!project_description || !project_id) { alert('Enter description and select project'); return; }
+  const btn = document.getElementById('ai-btn');
+  btn.textContent = '⏳ AI is thinking...';
+  btn.disabled = true;
+  try {
+    const data = await api('POST', '/ai/breakdown', { project_description, project_id });
+    const msg = document.getElementById('ai-message');
+    msg.textContent = data.message;
+    msg.classList.remove('hidden');
+    loadTasks(project_id);
+    document.getElementById('ai-desc').value = '';
+  } catch { alert('AI request failed'); }
+  btn.textContent = '✨ Generate Tasks with AI';
+  btn.disabled = false;
+}
+
+// INIT
+if (token) { showDashboard(); } 
+</script>
+</body>
+</html>
